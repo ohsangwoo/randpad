@@ -21,6 +21,7 @@ namespace RandPad
         private JavaList<Button> buttons;
         private TimeSpan topRecord;
         private TimeSpan totalElapsed;
+        private ToggleButton proToggleButton;
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
@@ -49,6 +50,12 @@ namespace RandPad
             buttons.Add(FindViewById<Button>(Resource.Id.button8));
             buttons.Add(FindViewById<Button>(Resource.Id.button9));
             buttons.Add(FindViewById<Button>(Resource.Id.button10));
+
+            proToggleButton = FindViewById<ToggleButton>(Resource.Id.toggleButton1);
+            proToggleButton.Click += delegate
+            {
+                Randomize();
+            };
         }
 
         private void Randomize()
@@ -56,12 +63,13 @@ namespace RandPad
             stopWatch.Reset();
             _cursor = 0;
             question = Get10DigitRandomDecimalNumbers(false);
-            var keypadMapping = Get10DigitRandomDecimalNumbers(true);
+            
+            
+            var keypadMapping = proToggleButton.Checked ? Get10DigitRandomDecimalNumbers(true) : "0789456123.";
             var numberTextView = FindViewById<TextView>(Resource.Id.textView1);
             
             numberTextView.Text = question;
 
- 
 
             for (var i = 0; i < buttons.Count; i++)
             {
@@ -79,11 +87,13 @@ namespace RandPad
 
             isButtonEventHooked = true;
 
-            stopWatch.Start();
         }
         public void OnKeyPadClicked (TextView textView, Button button)
         {
-            
+            if(_cursor == 0 && !stopWatch.IsRunning)
+            {
+                stopWatch.Start();
+            }
             if (question[_cursor].ToString().Equals(button.Text))
             {
                 _cursor++;
